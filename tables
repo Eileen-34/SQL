@@ -1,0 +1,142 @@
+/* Aufgabe 4
+Schreiben Sie SQL-Scripte fuer Erstellen der Tabellen (ohne Constraints!). */
+
+DROP TABLE Standort;
+DROP TABLE Applikation;
+DROP TABLE Nutzer;
+DROP TABLE Vorfall;
+DROP TABLE ApplikationVorfall;
+
+------------------
+-- CREATE TABLE --
+------------------
+
+CREATE TABLE Standort 
+(
+StandortID INT,
+Strasse VARCHAR2(25),
+Hausnummer INT,
+Raum INT,
+PLZ INT,
+Stadt VARCHAR2(25),
+Land VARCHAR2(25)
+);
+
+CREATE TABLE Applikation
+(
+ApplikationID VARCHAR2(25),
+StandortID INT,
+ApplikationName VARCHAR2(25), 
+Typ VARCHAR2(25),
+NutzerID INT
+);
+
+CREATE TABLE Nutzer
+(
+NutzerID INT,
+KundenID INT,
+Vorname VARCHAR2(25), 
+Nachname VARCHAR2(25),
+EMail VARCHAR2(55),
+Passwort TEXT
+);
+
+CREATE TABLE Vorfall
+(
+VorfallID INT,
+VorfallTyp VARCHAR2(25),
+Lokation VARCHAR2(25),
+Timestamp TEXT,                       /*DATE*/
+BetroffeneNutzer VARCHAR2(55), 
+ApplikationID VARCHAR2(25),
+Loesung VARCHAR2(250),
+Beauftrager INT,
+Bearbeiter INT
+);
+
+CREATE TABLE ApplikationVorfall
+(
+ApplikationID VARCHAR2(25),
+VorfallID INT
+);
+
+------------------
+--  DELETE FROM --
+------------------
+
+DELETE FROM Standort;
+DELETE FROM Applikation;
+DELETE FROM Nutzer;
+DELETE FROM Vorfall;
+DELETE FROM ApplikationVorfall;
+
+------------------
+-- INSERT VALUES--
+------------------
+
+/*Standort*/
+INSERT INTO Standort (StandortID, Strasse, Hausnummer, Raum, PLZ, Stadt, Land)
+VALUES (001, 'Franz-Ehrlich-Strasse', 9, 015, 12489, 'Berlin', 'Deutschland');
+
+INSERT INTO Standort (StandortID, Strasse, Hausnummer, Raum, PLZ, Stadt, Land)
+VALUES (002, 'Cranberry Woods Dr', 1000, 017, 16066, 'Pennsylvania', 'USA');
+
+/*Applikation*/
+INSERT INTO Applikation(ApplikationID, ApplikationName, Typ, NutzerID)
+VALUES ('12372-4', 'firegrid', 'Firefighter Safety', 255347);
+
+INSERT INTO Applikation(ApplikationID, ApplikationName, Typ, NutzerID)
+VALUES ('12373-5', 'ALTAIR io4', 'Gas Detection', 289125);
+
+/*Nutzer*/
+INSERT INTO Nutzer (NutzerID, KundenID, Vorname, Nachname, EMail, Passwort)
+VALUES (255347, 1678425, 'Lisa', 'Müller', 'alex.müller@gmx.de', 'Apfelschorle:85*');
+
+INSERT INTO Nutzer (NutzerID, KundenID, Vorname, Nachname, EMail, Passwort)
+VALUES (289125, 3948512, 'Maximilian', 'Otto', 'otto.Max@gmail.com', 'Wissenschaft24!');
+
+/*Vorfall*/
+INSERT INTO Vorfall (VorfallID, VorfallTyp, Lokation, Timestamp, BetroffeneNutzer, ApplikationID, Loesung, Beauftrager, Bearbeiter)
+VALUES (00001, 'Software-Problem', 'Berlin', '22.12.2023', 'Lisa Müller', '12372-4', 'System Update', 11343790, 19303423);
+
+/*ApplikationVorfall*/
+INSERT INTO ApplikationVorfall (ApplikationID, VorfallID)
+VALUES ('12372-4', 00001); 
+
+
+/* Aufgabe 5
+Schreiben Sie zwei SQL-Abfragen ueber mehrere (mind. zwei) Tabellen. */
+
+------------------
+--   ABFRAGEN   --
+------------------
+/* Informationen ueber Vorfaelle einer bestimmten Typ in Berlin */
+
+SELECT 
+    Vorfall.VorfallID,
+    Vorfall.VorfallTyp,
+    Vorfall.Timestamp,
+    Vorfall.BetroffeneNutzer,
+    Vorfall.ApplikationID,  
+    Applikation.ApplikationName
+FROM Vorfall, Applikation
+WHERE Vorfall.VorfallTyp = 'Software-Problem'
+    AND Vorfall.Lokation = 'Berlin'
+    AND Vorfall.ApplikationID = Applikation.ApplikationID;
+
+
+/* Informationen ueber Nutzer-Tabelle, bei der die NutzerID
+ mit der NutzerID in der Applikation-Tabelle uebereinstimmt und 
+ der Typ in Applikation 'Gas Detection' ist.*/
+
+SELECT 
+    Nutzer.NutzerID,
+    Nutzer.Vorname,
+    Nutzer.Nachname,
+    Nutzer.EMail,
+    Nutzer.Passwort
+FROM 
+    Nutzer, Applikation
+WHERE 
+    Nutzer.NutzerID = Applikation.NutzerID
+    AND Applikation.Typ = 'Gas Detection';
